@@ -7,10 +7,17 @@ namespace Password_Brute_ForceApp
         public Form1()
         {
             InitializeComponent();
-            PasswordHasher hasher = new PasswordHasher();
-            string testHash = hasher.HashPassword("test");
 
-            MessageBox.Show(testHash, "SHA256 Test Hash");
+            PasswordGenerator generator = new PasswordGenerator();
+            string password = generator.GeneratePassword();
+
+            PasswordHasher hasher = new PasswordHasher();
+            string hash = hasher.HashPassword(password);
+
+            MessageBox.Show(
+                $"Generated Password: {password}\nLength: {password.Length}\nHash: {hash}",
+                "Password Generator Test"
+            );
         }
 
         private void Form1_Load(object sender, EventArgs e)
