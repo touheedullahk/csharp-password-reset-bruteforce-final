@@ -8,16 +8,23 @@ namespace Password_Brute_ForceApp
         {
             InitializeComponent();
 
-            PasswordGenerator generator = new PasswordGenerator();
-            string password = generator.GeneratePassword();
-
             PasswordHasher hasher = new PasswordHasher();
-            string hash = hasher.HashPassword(password);
+            PasswordValidator validator = new PasswordValidator();
+
+            string originalPassword = "abc1";
+            string hash = hasher.HashPassword(originalPassword);
+
+            bool correctTest = validator.IsPasswordMatch("abc1", hash);
+            bool wrongTest = validator.IsPasswordMatch("wrong", hash);
 
             MessageBox.Show(
-                $"Generated Password: {password}\nLength: {password.Length}\nHash: {hash}",
-                "Password Generator Test"
-            );
+                $"Original Password: {originalPassword}\n" +
+                $"Hash: {hash}\n\n" +
+                $"Correct password test: {correctTest}\n" +
+                $"Wrong password test: {wrongTest}",
+                "Password Validator Test"
+                );
+
         }
 
         private void Form1_Load(object sender, EventArgs e)
