@@ -8,12 +8,12 @@ namespace PasswordBruteForceApp.Services
     {
         public string HashPassword(string password)
         {
-            if (password == null)
+            if (string.IsNullOrEmpty(password))
             {
-                throw new ArgumentNullException(nameof(password), "Password cannot be null.");
+                throw new ArgumentException("Password cannot be null or empty.", nameof(password));
             }
 
-            string saltedPassword = AppSettings.StaticSalt + password;
+            string saltedPassword = CombineSaltAndPassword(password);
 
             using SHA256 sha256 = SHA256.Create();
 
@@ -21,6 +21,23 @@ namespace PasswordBruteForceApp.Services
             byte[] hashBytes = sha256.ComputeHash(inputBytes);
 
             return ConvertToHexString(hashBytes);
+        }
+
+        public bool VerifyPassword(string plainPassword, string expectedHash)
+        {
+            if (string.IsNullOrEmpty(expectedHash))
+            {
+                return false;
+            }
+
+            string actualHash = HashPassword(plainPassword);
+
+            return string.Equals(actualHash, expectedHash, StringComparison.OrdinalIgnoreCase);
+        }
+
+        private string CombineSaltAndPassword(string password)
+        {
+            return AppSettings.StaticSalt + password;
         }
 
         private string ConvertToHexString(byte[] bytes)
