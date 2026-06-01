@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace PasswordBruteForceApp.Models
+namespace Password_Brute_ForceApp.Models
 {
     public class AttackResult
     {

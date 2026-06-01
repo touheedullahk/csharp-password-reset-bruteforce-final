@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace PasswordBruteForceApp.Services
+namespace Password_Brute_ForceApp.Services
 {
     public class PasswordValidator
     {

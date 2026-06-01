@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace PasswordBruteForceApp.Services
+namespace Password_Brute_ForceApp.Services
 {
     public class BruteForceGenerator
     {

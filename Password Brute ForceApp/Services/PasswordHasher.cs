@@ -2,7 +2,7 @@
 using System.Security.Cryptography;
 using System.Text;
 
-namespace PasswordBruteForceApp.Services
+namespace Password_Brute_ForceApp.Services
 {
     public class PasswordHasher
     {

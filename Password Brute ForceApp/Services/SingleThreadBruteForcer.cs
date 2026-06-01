@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Threading;
-using PasswordBruteForceApp.Models;
+using Password_Brute_ForceApp.Models;
 
-namespace PasswordBruteForceApp.Services
+namespace Password_Brute_ForceApp.Services
 {
     public class SingleThreadBruteForcer
     {
