@@ -12,8 +12,9 @@ namespace Password_Brute_ForceApp
         private readonly PasswordGenerator _passwordGenerator;
         private readonly PasswordHasher _passwordHasher;
         private readonly SingleThreadBruteForcer _singleThreadBruteForcer;
+        private readonly MultiThreadBruteForcer _multiThreadBruteForcer;
 
-        private CancellationTokenSource? _cancellationTokenSource;
+        private CancellationTokenSource _cancellationTokenSource;
 
         public MainForm()
         {
@@ -22,6 +23,7 @@ namespace Password_Brute_ForceApp
             _passwordGenerator = new PasswordGenerator();
             _passwordHasher = new PasswordHasher();
             _singleThreadBruteForcer = new SingleThreadBruteForcer();
+            _multiThreadBruteForcer = new MultiThreadBruteForcer();
 
             AddLog("Application started.");
         }
@@ -56,16 +58,8 @@ namespace Password_Brute_ForceApp
 
         private async void btnStartSingleThread_Click(object sender, EventArgs e)
         {
-            if (string.IsNullOrWhiteSpace(txtHash.Text))
+            if (!CanStartAttack())
             {
-                MessageBox.Show(
-                    "Please create a password first.",
-                    "Missing Hash",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Warning
-                );
-
-                AddLog("Single-thread attack could not start because no hash exists.");
                 return;
             }
 
@@ -90,14 +84,7 @@ namespace Password_Brute_ForceApp
             }
             catch (Exception ex)
             {
-                MessageBox.Show(
-                    $"Error during single-thread attack: {ex.Message}",
-                    "Attack Error",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Error
-                );
-
-                AddLog($"Error during single-thread attack: {ex.Message}");
+                ShowAttackError("single-thread", ex);
             }
             finally
             {
@@ -105,9 +92,41 @@ namespace Password_Brute_ForceApp
             }
         }
 
-        private void btnStartMultiThread_Click(object sender, EventArgs e)
+        private async void btnStartMultiThread_Click(object sender, EventArgs e)
         {
-            AddLog("Multi-thread attack button clicked. Backend connection will be added in the next step.");
+            if (!CanStartAttack())
+            {
+                return;
+            }
+
+            PrepareAttackUi("multi-thread");
+
+            _cancellationTokenSource = new CancellationTokenSource();
+
+            try
+            {
+                string targetHash = txtHash.Text;
+
+                AddLog("Multi-thread brute-force attack started.");
+                AddLog($"Maximum worker threads allowed: {AppSettings.MaxWorkerThreads}");
+
+                AttackResult result = await Task.Run(() =>
+                    _multiThreadBruteForcer.StartAttack(
+                        targetHash,
+                        _cancellationTokenSource.Token
+                    )
+                );
+
+                DisplayAttackResult(result, "Multi-thread");
+            }
+            catch (Exception ex)
+            {
+                ShowAttackError("multi-thread", ex);
+            }
+            finally
+            {
+                ResetAttackUi();
+            }
         }
 
         private void btnStopAttack_Click(object sender, EventArgs e)
@@ -120,6 +139,24 @@ namespace Password_Brute_ForceApp
 
             _cancellationTokenSource.Cancel();
             AddLog("Stop requested. Attack cancellation signal sent.");
+        }
+
+        private bool CanStartAttack()
+        {
+            if (string.IsNullOrWhiteSpace(txtHash.Text))
+            {
+                MessageBox.Show(
+                    "Please create a password first.",
+                    "Missing Hash",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Warning
+                );
+
+                AddLog("Attack could not start because no hash exists.");
+                return false;
+            }
+
+            return true;
         }
 
         private void PrepareAttackUi(string attackType)
@@ -146,8 +183,11 @@ namespace Password_Brute_ForceApp
             btnStartMultiThread.Enabled = true;
             btnStopAttack.Enabled = true;
 
-            _cancellationTokenSource?.Dispose();
-            _cancellationTokenSource = null;
+            if (_cancellationTokenSource != null)
+            {
+                _cancellationTokenSource.Dispose();
+                _cancellationTokenSource = null;
+            }
         }
 
         private void DisplayAttackResult(AttackResult result, string attackName)
@@ -163,6 +203,7 @@ namespace Password_Brute_ForceApp
                 AddLog($"Password found: {result.FoundPassword}");
                 AddLog($"Attempts checked: {result.AttemptsCount}");
                 AddLog($"Elapsed time: {result.ElapsedTime}");
+                AddLog($"Threads used: {result.ThreadsUsed}");
             }
             else
             {
@@ -170,7 +211,20 @@ namespace Password_Brute_ForceApp
                 AddLog($"{attackName} attack stopped or password was not found.");
                 AddLog($"Attempts checked before stopping: {result.AttemptsCount}");
                 AddLog($"Elapsed time: {result.ElapsedTime}");
+                AddLog($"Threads used: {result.ThreadsUsed}");
             }
+        }
+
+        private void ShowAttackError(string attackType, Exception ex)
+        {
+            MessageBox.Show(
+                $"Error during {attackType} attack: {ex.Message}",
+                "Attack Error",
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Error
+            );
+
+            AddLog($"Error during {attackType} attack: {ex.Message}");
         }
 
         private void ClearAttackOutput()
