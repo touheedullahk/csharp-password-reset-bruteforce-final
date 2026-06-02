@@ -13,6 +13,7 @@ namespace Password_Brute_ForceApp
         private readonly PasswordHasher _passwordHasher;
         private readonly SingleThreadBruteForcer _singleThreadBruteForcer;
         private readonly MultiThreadBruteForcer _multiThreadBruteForcer;
+        private readonly PerformanceLogger _performanceLogger;
 
         private CancellationTokenSource _cancellationTokenSource;
 
@@ -24,6 +25,7 @@ namespace Password_Brute_ForceApp
             _passwordHasher = new PasswordHasher();
             _singleThreadBruteForcer = new SingleThreadBruteForcer();
             _multiThreadBruteForcer = new MultiThreadBruteForcer();
+            _performanceLogger = new PerformanceLogger();
 
             AddLog("Application started.");
         }
@@ -81,6 +83,7 @@ namespace Password_Brute_ForceApp
                 );
 
                 DisplayAttackResult(result, "Single-thread");
+                LogPerformanceResult("Single-thread", result);
             }
             catch (Exception ex)
             {
@@ -118,6 +121,7 @@ namespace Password_Brute_ForceApp
                 );
 
                 DisplayAttackResult(result, "Multi-thread");
+                LogPerformanceResult("Multi-thread", result);
             }
             catch (Exception ex)
             {
@@ -198,7 +202,7 @@ namespace Password_Brute_ForceApp
 
             if (result.IsSuccess)
             {
-                txtFoundPassword.Text = result.FoundPassword ?? "";
+                txtFoundPassword.Text = result.FoundPassword;
                 AddLog($"{attackName} attack completed successfully.");
                 AddLog($"Password found: {result.FoundPassword}");
                 AddLog($"Attempts checked: {result.AttemptsCount}");
@@ -212,6 +216,26 @@ namespace Password_Brute_ForceApp
                 AddLog($"Attempts checked before stopping: {result.AttemptsCount}");
                 AddLog($"Elapsed time: {result.ElapsedTime}");
                 AddLog($"Threads used: {result.ThreadsUsed}");
+            }
+        }
+
+        private void LogPerformanceResult(string attackType, AttackResult attackResult)
+        {
+            try
+            {
+                _performanceLogger.LogAttackResult(
+                    attackType,
+                    txtGeneratedPassword.Text,
+                    txtHash.Text,
+                    attackResult
+                );
+
+                AddLog($"{attackType} result saved to performance log.");
+                AddLog($"Log file location: {_performanceLogger.GetLogFilePath()}");
+            }
+            catch (Exception ex)
+            {
+                AddLog($"Could not write performance log: {ex.Message}");
             }
         }
 
