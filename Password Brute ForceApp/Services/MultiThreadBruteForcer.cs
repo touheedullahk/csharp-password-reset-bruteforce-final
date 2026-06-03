@@ -15,7 +15,10 @@ namespace Password_Brute_ForceApp.Services
             _validator = new PasswordValidator();
         }
 
-        public AttackResult StartAttack(string targetHash, CancellationToken externalCancellationToken)
+        public AttackResult StartAttack(
+            string targetHash,
+            CancellationToken externalCancellationToken,
+            IProgress<ProgressInfo> progress = null)
         {
             if (string.IsNullOrEmpty(targetHash))
             {
@@ -28,46 +31,57 @@ namespace Password_Brute_ForceApp.Services
             Task[] tasks = new Task[workerCount];
 
             long attempts = 0;
-            string? foundPassword = null;
+            long totalCombinations = AppSettings.GetTotalCombinationCount();
 
-            using CancellationTokenSource internalCancellationSource =
-                CancellationTokenSource.CreateLinkedTokenSource(externalCancellationToken);
+            string foundPassword = "";
 
-            CancellationToken cancellationToken = internalCancellationSource.Token;
-
-            for (int workerIndex = 0; workerIndex < workerCount; workerIndex++)
+            using (CancellationTokenSource internalCancellationSource =
+                CancellationTokenSource.CreateLinkedTokenSource(externalCancellationToken))
             {
-                int localWorkerIndex = workerIndex;
+                CancellationToken cancellationToken = internalCancellationSource.Token;
 
-                tasks[localWorkerIndex] = Task.Run(() =>
+                for (int workerIndex = 0; workerIndex < workerCount; workerIndex++)
                 {
-                    SearchWorker(
-                        targetHash,
-                        localWorkerIndex,
-                        workerCount,
-                        cancellationToken,
-                        internalCancellationSource,
-                        ref attempts,
-                        ref foundPassword
-                    );
-                }, cancellationToken);
-            }
+                    int localWorkerIndex = workerIndex;
 
-            try
-            {
-                Task.WaitAll(tasks);
-            }
-            catch (AggregateException)
-            {
-                // Some tasks may stop because cancellation was requested.
-                // This is expected when the password is found or user stops the attack.
+                    tasks[localWorkerIndex] = Task.Run(() =>
+                    {
+                        SearchWorker(
+                            targetHash,
+                            localWorkerIndex,
+                            workerCount,
+                            cancellationToken,
+                            internalCancellationSource,
+                            ref attempts,
+                            ref foundPassword,
+                            totalCombinations,
+                            progress
+                        );
+                    }, cancellationToken);
+                }
+
+                try
+                {
+                    Task.WaitAll(tasks);
+                }
+                catch (AggregateException)
+                {
+                    // Cancellation can cause task exceptions. This is expected when stopping.
+                }
             }
 
             stopwatch.Stop();
 
+            ReportProgress(
+                progress,
+                attempts,
+                totalCombinations,
+                AppSettings.BruteForceMaxLength
+            );
+
             return new AttackResult
             {
-                IsSuccess = foundPassword != null,
+                IsSuccess = !string.IsNullOrEmpty(foundPassword),
                 FoundPassword = foundPassword,
                 AttemptsCount = attempts,
                 ElapsedTime = stopwatch.Elapsed,
@@ -82,7 +96,9 @@ namespace Password_Brute_ForceApp.Services
             CancellationToken cancellationToken,
             CancellationTokenSource cancellationSource,
             ref long attempts,
-            ref string? foundPassword)
+            ref string foundPassword,
+            long totalCombinations,
+            IProgress<ProgressInfo> progress)
         {
             for (int length = AppSettings.BruteForceMinLength; length <= AppSettings.BruteForceMaxLength; length++)
             {
@@ -97,11 +113,17 @@ namespace Password_Brute_ForceApp.Services
 
                     string candidatePassword = ConvertIndexToPassword(combinationIndex, length);
 
-                    Interlocked.Increment(ref attempts);
+                    long currentAttempts = Interlocked.Increment(ref attempts);
+
+                    if (currentAttempts % 1000 == 0)
+                    {
+                        ReportProgress(progress, currentAttempts, totalCombinations, length);
+                    }
 
                     if (_validator.IsPasswordMatch(candidatePassword, targetHash))
                     {
                         foundPassword = candidatePassword;
+                        ReportProgress(progress, currentAttempts, totalCombinations, length);
                         cancellationSource.Cancel();
                         return;
                     }
@@ -135,6 +157,38 @@ namespace Password_Brute_ForceApp.Services
             }
 
             return result;
+        }
+
+        private void ReportProgress(
+            IProgress<ProgressInfo> progress,
+            long attempts,
+            long totalCombinations,
+            int currentLength)
+        {
+            if (progress == null)
+            {
+                return;
+            }
+
+            int percentage = 0;
+
+            if (totalCombinations > 0)
+            {
+                percentage = (int)((attempts * 100) / totalCombinations);
+            }
+
+            if (percentage > 100)
+            {
+                percentage = 100;
+            }
+
+            progress.Report(new ProgressInfo
+            {
+                AttemptsChecked = attempts,
+                TotalCombinations = totalCombinations,
+                CurrentLength = currentLength,
+                ProgressPercentage = percentage
+            });
         }
     }
 }

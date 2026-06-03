@@ -16,6 +16,8 @@ namespace Password_Brute_ForceApp
         private readonly PerformanceLogger _performanceLogger;
 
         private CancellationTokenSource _cancellationTokenSource;
+        private Timer _elapsedTimer;
+        private DateTime _attackStartTime;
 
         public MainForm()
         {
@@ -27,7 +29,12 @@ namespace Password_Brute_ForceApp
             _multiThreadBruteForcer = new MultiThreadBruteForcer();
             _performanceLogger = new PerformanceLogger();
 
+            _elapsedTimer = new Timer();
+            _elapsedTimer.Interval = 250;
+            _elapsedTimer.Tick += ElapsedTimer_Tick;
+
             AddLog("Application started.");
+            SetStatus("Ready.");
         }
 
         private void btnCreatePassword_Click(object sender, EventArgs e)
@@ -44,6 +51,7 @@ namespace Password_Brute_ForceApp
 
                 AddLog($"Password generated successfully. Length: {generatedPassword.Length}");
                 AddLog("SHA256 hash created using static salt.");
+                SetStatus("Password created. Ready to start attack.");
             }
             catch (Exception ex)
             {
@@ -55,6 +63,7 @@ namespace Password_Brute_ForceApp
                 );
 
                 AddLog($"Error while creating password: {ex.Message}");
+                SetStatus("Password creation failed.");
             }
         }
 
@@ -74,11 +83,15 @@ namespace Password_Brute_ForceApp
                 string targetHash = txtHash.Text;
 
                 AddLog("Single-thread brute-force attack started.");
+                SetStatus("Single-thread attack running...");
+
+                IProgress<ProgressInfo> progress = new Progress<ProgressInfo>(UpdateProgressDisplay);
 
                 AttackResult result = await Task.Run(() =>
                     _singleThreadBruteForcer.StartAttack(
                         targetHash,
-                        _cancellationTokenSource.Token
+                        _cancellationTokenSource.Token,
+                        progress
                     )
                 );
 
@@ -112,11 +125,15 @@ namespace Password_Brute_ForceApp
 
                 AddLog("Multi-thread brute-force attack started.");
                 AddLog($"Maximum worker threads allowed: {AppSettings.MaxWorkerThreads}");
+                SetStatus("Multi-thread attack running...");
+
+                IProgress<ProgressInfo> progress = new Progress<ProgressInfo>(UpdateProgressDisplay);
 
                 AttackResult result = await Task.Run(() =>
                     _multiThreadBruteForcer.StartAttack(
                         targetHash,
-                        _cancellationTokenSource.Token
+                        _cancellationTokenSource.Token,
+                        progress
                     )
                 );
 
@@ -138,11 +155,13 @@ namespace Password_Brute_ForceApp
             if (_cancellationTokenSource == null)
             {
                 AddLog("Stop button clicked, but no attack is currently running.");
+                SetStatus("No attack is currently running.");
                 return;
             }
 
             _cancellationTokenSource.Cancel();
             AddLog("Stop requested. Attack cancellation signal sent.");
+            SetStatus("Stopping attack...");
         }
 
         private bool CanStartAttack()
@@ -157,6 +176,7 @@ namespace Password_Brute_ForceApp
                 );
 
                 AddLog("Attack could not start because no hash exists.");
+                SetStatus("Create a password before starting attack.");
                 return false;
             }
 
@@ -167,7 +187,11 @@ namespace Password_Brute_ForceApp
         {
             ClearAttackOutput();
 
-            progressBarAttack.Style = ProgressBarStyle.Marquee;
+            progressBarAttack.Style = ProgressBarStyle.Blocks;
+            progressBarAttack.Value = 0;
+
+            _attackStartTime = DateTime.Now;
+            _elapsedTimer.Start();
 
             btnCreatePassword.Enabled = false;
             btnStartSingleThread.Enabled = false;
@@ -175,12 +199,12 @@ namespace Password_Brute_ForceApp
             btnStopAttack.Enabled = true;
 
             AddLog($"Preparing {attackType} attack...");
+            SetStatus($"Preparing {attackType} attack...");
         }
 
         private void ResetAttackUi()
         {
-            progressBarAttack.Style = ProgressBarStyle.Blocks;
-            progressBarAttack.Value = 100;
+            _elapsedTimer.Stop();
 
             btnCreatePassword.Enabled = true;
             btnStartSingleThread.Enabled = true;
@@ -194,6 +218,31 @@ namespace Password_Brute_ForceApp
             }
         }
 
+        private void UpdateProgressDisplay(ProgressInfo progressInfo)
+        {
+            int progressValue = progressInfo.ProgressPercentage;
+
+            if (progressValue < 0)
+            {
+                progressValue = 0;
+            }
+
+            if (progressValue > 100)
+            {
+                progressValue = 100;
+            }
+
+            progressBarAttack.Value = progressValue;
+            lblProgress.Text = $"Progress: {progressValue}%";
+
+            txtAttempts.Text = progressInfo.AttemptsChecked.ToString();
+
+            SetStatus(
+                $"Searching length {progressInfo.CurrentLength} | " +
+                $"Attempts: {progressInfo.AttemptsChecked} / {progressInfo.TotalCombinations}"
+            );
+        }
+
         private void DisplayAttackResult(AttackResult result, string attackName)
         {
             txtElapsedTime.Text = result.ElapsedTime.ToString(@"hh\:mm\:ss\.fff");
@@ -202,20 +251,28 @@ namespace Password_Brute_ForceApp
 
             if (result.IsSuccess)
             {
+                progressBarAttack.Value = 100;
+                lblProgress.Text = "Progress: 100%";
                 txtFoundPassword.Text = result.FoundPassword;
+
                 AddLog($"{attackName} attack completed successfully.");
                 AddLog($"Password found: {result.FoundPassword}");
                 AddLog($"Attempts checked: {result.AttemptsCount}");
                 AddLog($"Elapsed time: {result.ElapsedTime}");
                 AddLog($"Threads used: {result.ThreadsUsed}");
+
+                SetStatus($"{attackName} attack completed. Password found.");
             }
             else
             {
                 txtFoundPassword.Text = "Not found / stopped";
+
                 AddLog($"{attackName} attack stopped or password was not found.");
                 AddLog($"Attempts checked before stopping: {result.AttemptsCount}");
                 AddLog($"Elapsed time: {result.ElapsedTime}");
                 AddLog($"Threads used: {result.ThreadsUsed}");
+
+                SetStatus($"{attackName} attack stopped or password was not found.");
             }
         }
 
@@ -249,17 +306,32 @@ namespace Password_Brute_ForceApp
             );
 
             AddLog($"Error during {attackType} attack: {ex.Message}");
+            SetStatus($"{attackType} attack failed.");
         }
 
         private void ClearAttackOutput()
         {
             progressBarAttack.Style = ProgressBarStyle.Blocks;
             progressBarAttack.Value = 0;
+            lblProgress.Text = "Progress: 0%";
 
             txtElapsedTime.Clear();
             txtAttempts.Clear();
             txtThreadsUsed.Clear();
             txtFoundPassword.Clear();
+
+            SetStatus("Ready.");
+        }
+
+        private void ElapsedTimer_Tick(object sender, EventArgs e)
+        {
+            TimeSpan elapsed = DateTime.Now - _attackStartTime;
+            txtElapsedTime.Text = elapsed.ToString(@"hh\:mm\:ss\.fff");
+        }
+
+        private void SetStatus(string message)
+        {
+            AddLog($"Status: {message}");
         }
 
         private void AddLog(string message)

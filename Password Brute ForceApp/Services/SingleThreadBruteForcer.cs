@@ -16,7 +16,10 @@ namespace Password_Brute_ForceApp.Services
             _validator = new PasswordValidator();
         }
 
-        public AttackResult StartAttack(string targetHash, CancellationToken cancellationToken)
+        public AttackResult StartAttack(
+            string targetHash,
+            CancellationToken cancellationToken,
+            IProgress<ProgressInfo> progress = null)
         {
             if (string.IsNullOrEmpty(targetHash))
             {
@@ -24,51 +27,99 @@ namespace Password_Brute_ForceApp.Services
             }
 
             Stopwatch stopwatch = Stopwatch.StartNew();
+
             long attempts = 0;
+            long totalCombinations = AppSettings.GetTotalCombinationCount();
 
-            foreach (string candidatePassword in _generator.GenerateAllCombinations())
+            for (int length = AppSettings.BruteForceMinLength; length <= AppSettings.BruteForceMaxLength; length++)
             {
-                if (cancellationToken.IsCancellationRequested)
+                foreach (string candidatePassword in _generator.GenerateCombinationsByLength(length))
                 {
-                    stopwatch.Stop();
-
-                    return new AttackResult
+                    if (cancellationToken.IsCancellationRequested)
                     {
-                        IsSuccess = false,
-                        FoundPassword = null,
-                        AttemptsCount = attempts,
-                        ElapsedTime = stopwatch.Elapsed,
-                        ThreadsUsed = 1
-                    };
-                }
+                        stopwatch.Stop();
 
-                attempts++;
+                        ReportProgress(progress, attempts, totalCombinations, length);
 
-                if (_validator.IsPasswordMatch(candidatePassword, targetHash))
-                {
-                    stopwatch.Stop();
+                        return new AttackResult
+                        {
+                            IsSuccess = false,
+                            FoundPassword = "",
+                            AttemptsCount = attempts,
+                            ElapsedTime = stopwatch.Elapsed,
+                            ThreadsUsed = 1
+                        };
+                    }
 
-                    return new AttackResult
+                    attempts++;
+
+                    if (attempts % 1000 == 0)
                     {
-                        IsSuccess = true,
-                        FoundPassword = candidatePassword,
-                        AttemptsCount = attempts,
-                        ElapsedTime = stopwatch.Elapsed,
-                        ThreadsUsed = 1
-                    };
+                        ReportProgress(progress, attempts, totalCombinations, length);
+                    }
+
+                    if (_validator.IsPasswordMatch(candidatePassword, targetHash))
+                    {
+                        stopwatch.Stop();
+
+                        ReportProgress(progress, attempts, totalCombinations, length);
+
+                        return new AttackResult
+                        {
+                            IsSuccess = true,
+                            FoundPassword = candidatePassword,
+                            AttemptsCount = attempts,
+                            ElapsedTime = stopwatch.Elapsed,
+                            ThreadsUsed = 1
+                        };
+                    }
                 }
             }
 
             stopwatch.Stop();
 
+            ReportProgress(progress, attempts, totalCombinations, AppSettings.BruteForceMaxLength);
+
             return new AttackResult
             {
                 IsSuccess = false,
-                FoundPassword = null,
+                FoundPassword = "",
                 AttemptsCount = attempts,
                 ElapsedTime = stopwatch.Elapsed,
                 ThreadsUsed = 1
             };
+        }
+
+        private void ReportProgress(
+            IProgress<ProgressInfo> progress,
+            long attempts,
+            long totalCombinations,
+            int currentLength)
+        {
+            if (progress == null)
+            {
+                return;
+            }
+
+            int percentage = 0;
+
+            if (totalCombinations > 0)
+            {
+                percentage = (int)((attempts * 100) / totalCombinations);
+            }
+
+            if (percentage > 100)
+            {
+                percentage = 100;
+            }
+
+            progress.Report(new ProgressInfo
+            {
+                AttemptsChecked = attempts,
+                TotalCombinations = totalCombinations,
+                CurrentLength = currentLength,
+                ProgressPercentage = percentage
+            });
         }
     }
 }
