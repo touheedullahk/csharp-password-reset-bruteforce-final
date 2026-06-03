@@ -19,7 +19,7 @@ namespace Password_Brute_ForceApp.Services
         public AttackResult StartAttack(
             string targetHash,
             CancellationToken cancellationToken,
-            IProgress<ProgressInfo> progress = null)
+            IProgress<ProgressInfo>? progress = null)
         {
             if (string.IsNullOrEmpty(targetHash))
             {
@@ -44,7 +44,7 @@ namespace Password_Brute_ForceApp.Services
                         return new AttackResult
                         {
                             IsSuccess = false,
-                            FoundPassword = "",
+                            FoundPassword = null,
                             AttemptsCount = attempts,
                             ElapsedTime = stopwatch.Elapsed,
                             ThreadsUsed = 1
@@ -83,7 +83,7 @@ namespace Password_Brute_ForceApp.Services
             return new AttackResult
             {
                 IsSuccess = false,
-                FoundPassword = "",
+                FoundPassword = null,
                 AttemptsCount = attempts,
                 ElapsedTime = stopwatch.Elapsed,
                 ThreadsUsed = 1
@@ -91,7 +91,7 @@ namespace Password_Brute_ForceApp.Services
         }
 
         private void ReportProgress(
-            IProgress<ProgressInfo> progress,
+            IProgress<ProgressInfo>? progress,
             long attempts,
             long totalCombinations,
             int currentLength)

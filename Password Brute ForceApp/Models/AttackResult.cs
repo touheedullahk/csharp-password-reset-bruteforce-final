@@ -6,7 +6,7 @@ namespace Password_Brute_ForceApp.Models
     {
         public bool IsSuccess { get; set; }
 
-        public string FoundPassword { get; set; }
+        public string? FoundPassword { get; set; }
 
         public long AttemptsCount { get; set; }
 

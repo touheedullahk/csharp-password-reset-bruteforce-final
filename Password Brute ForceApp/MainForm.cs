@@ -15,8 +15,8 @@ namespace Password_Brute_ForceApp
         private readonly MultiThreadBruteForcer _multiThreadBruteForcer;
         private readonly PerformanceLogger _performanceLogger;
 
-        private CancellationTokenSource _cancellationTokenSource;
-        private Timer _elapsedTimer;
+        private CancellationTokenSource? _cancellationTokenSource;
+        private System.Windows.Forms.Timer _elapsedTimer;
         private DateTime _attackStartTime;
 
         public MainForm()
@@ -29,7 +29,7 @@ namespace Password_Brute_ForceApp
             _multiThreadBruteForcer = new MultiThreadBruteForcer();
             _performanceLogger = new PerformanceLogger();
 
-            _elapsedTimer = new Timer();
+            _elapsedTimer = new System.Windows.Forms.Timer();
             _elapsedTimer.Interval = 250;
             _elapsedTimer.Tick += ElapsedTimer_Tick;
 
@@ -37,7 +37,7 @@ namespace Password_Brute_ForceApp
             SetStatus("Ready.");
         }
 
-        private void btnCreatePassword_Click(object sender, EventArgs e)
+        private void btnCreatePassword_Click(object? sender, EventArgs e)
         {
             try
             {
@@ -67,7 +67,7 @@ namespace Password_Brute_ForceApp
             }
         }
 
-        private async void btnStartSingleThread_Click(object sender, EventArgs e)
+        private async void btnStartSingleThread_Click(object? sender, EventArgs e)
         {
             if (!CanStartAttack())
             {
@@ -108,7 +108,7 @@ namespace Password_Brute_ForceApp
             }
         }
 
-        private async void btnStartMultiThread_Click(object sender, EventArgs e)
+        private async void btnStartMultiThread_Click(object? sender, EventArgs e)
         {
             if (!CanStartAttack())
             {
@@ -150,7 +150,7 @@ namespace Password_Brute_ForceApp
             }
         }
 
-        private void btnStopAttack_Click(object sender, EventArgs e)
+        private void btnStopAttack_Click(object? sender, EventArgs e)
         {
             if (_cancellationTokenSource == null)
             {
@@ -234,7 +234,6 @@ namespace Password_Brute_ForceApp
 
             progressBarAttack.Value = progressValue;
             lblProgress.Text = $"Progress: {progressValue}%";
-
             txtAttempts.Text = progressInfo.AttemptsChecked.ToString();
 
             SetStatus(
@@ -253,7 +252,7 @@ namespace Password_Brute_ForceApp
             {
                 progressBarAttack.Value = 100;
                 lblProgress.Text = "Progress: 100%";
-                txtFoundPassword.Text = result.FoundPassword;
+                txtFoundPassword.Text = result.FoundPassword ?? string.Empty;
 
                 AddLog($"{attackName} attack completed successfully.");
                 AddLog($"Password found: {result.FoundPassword}");
@@ -323,7 +322,7 @@ namespace Password_Brute_ForceApp
             SetStatus("Ready.");
         }
 
-        private void ElapsedTimer_Tick(object sender, EventArgs e)
+        private void ElapsedTimer_Tick(object? sender, EventArgs e)
         {
             TimeSpan elapsed = DateTime.Now - _attackStartTime;
             txtElapsedTime.Text = elapsed.ToString(@"hh\:mm\:ss\.fff");
@@ -331,7 +330,7 @@ namespace Password_Brute_ForceApp
 
         private void SetStatus(string message)
         {
-            AddLog($"Status: {message}");
+            lblStatus.Text = $"Status: {message}";
         }
 
         private void AddLog(string message)

@@ -18,7 +18,7 @@ namespace Password_Brute_ForceApp.Services
         public AttackResult StartAttack(
             string targetHash,
             CancellationToken externalCancellationToken,
-            IProgress<ProgressInfo> progress = null)
+            IProgress<ProgressInfo>? progress = null)
         {
             if (string.IsNullOrEmpty(targetHash))
             {
@@ -33,7 +33,7 @@ namespace Password_Brute_ForceApp.Services
             long attempts = 0;
             long totalCombinations = AppSettings.GetTotalCombinationCount();
 
-            string foundPassword = "";
+            string? foundPassword = null;
 
             using (CancellationTokenSource internalCancellationSource =
                 CancellationTokenSource.CreateLinkedTokenSource(externalCancellationToken))
@@ -96,9 +96,9 @@ namespace Password_Brute_ForceApp.Services
             CancellationToken cancellationToken,
             CancellationTokenSource cancellationSource,
             ref long attempts,
-            ref string foundPassword,
+            ref string? foundPassword,
             long totalCombinations,
-            IProgress<ProgressInfo> progress)
+            IProgress<ProgressInfo>? progress)
         {
             for (int length = AppSettings.BruteForceMinLength; length <= AppSettings.BruteForceMaxLength; length++)
             {
@@ -160,7 +160,7 @@ namespace Password_Brute_ForceApp.Services
         }
 
         private void ReportProgress(
-            IProgress<ProgressInfo> progress,
+            IProgress<ProgressInfo>? progress,
             long attempts,
             long totalCombinations,
             int currentLength)
