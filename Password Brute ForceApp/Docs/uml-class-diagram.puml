@@ -1,0 +1,118 @@
+@startuml
+title Password Reset Brute Force Application - UML Class Diagram
+
+class MainForm {
+    - PasswordGenerator _passwordGenerator
+    - PasswordHasher _passwordHasher
+    - SingleThreadBruteForcer _singleThreadBruteForcer
+    - MultiThreadBruteForcer _multiThreadBruteForcer
+    - PerformanceLogger _performanceLogger
+    - CancellationTokenSource _cancellationTokenSource
+    - Timer _elapsedTimer
+    + MainForm()
+    - btnCreatePassword_Click()
+    - btnStartSingleThread_Click()
+    - btnStartMultiThread_Click()
+    - btnStopAttack_Click()
+    - DisplayAttackResult()
+    - LogPerformanceResult()
+    - UpdateProgressDisplay()
+}
+
+class AppSettings {
+    + StaticSalt
+    + CharacterSet
+    + GeneratedPasswordMinLength
+    + GeneratedPasswordMaxLengthExclusive
+    + BruteForceMinLength
+    + BruteForceMaxLength
+    + MaxWorkerThreads
+    + GetTotalCombinationCount()
+}
+
+class PasswordGenerator {
+    + GeneratePassword()
+}
+
+class PasswordHasher {
+    + HashPassword(password)
+    + VerifyPassword(plainPassword, expectedHash)
+    - CombineSaltAndPassword(password)
+    - ConvertToHexString(bytes)
+}
+
+class PasswordValidator {
+    - PasswordHasher _passwordHasher
+    + IsPasswordMatch(candidatePassword, targetHash)
+}
+
+class BruteForceGenerator {
+    + GenerateAllCombinations()
+    + GenerateCombinationsByLength(length)
+    - GenerateRecursive(currentCombination, position, length)
+}
+
+class SingleThreadBruteForcer {
+    - BruteForceGenerator _generator
+    - PasswordValidator _validator
+    + StartAttack(targetHash, cancellationToken, progress)
+    - ReportProgress(progress, attempts, totalCombinations, currentLength)
+}
+
+class MultiThreadBruteForcer {
+    - PasswordValidator _validator
+    + StartAttack(targetHash, cancellationToken, progress)
+    - SearchWorker()
+    - ConvertIndexToPassword(index, length)
+    - CalculateCombinationCount(length)
+    - ReportProgress(progress, attempts, totalCombinations, currentLength)
+}
+
+class PerformanceLogger {
+    - string _logFilePath
+    + LogAttackResult(attackType, generatedPassword, targetHash, attackResult)
+    + GetLogFilePath()
+    - GetProjectDirectory()
+}
+
+class AttackResult {
+    + bool IsSuccess
+    + string FoundPassword
+    + long AttemptsCount
+    + TimeSpan ElapsedTime
+    + int ThreadsUsed
+}
+
+class ProgressInfo {
+    + long AttemptsChecked
+    + long TotalCombinations
+    + int CurrentLength
+    + int ProgressPercentage
+}
+
+MainForm --> PasswordGenerator
+MainForm --> PasswordHasher
+MainForm --> SingleThreadBruteForcer
+MainForm --> MultiThreadBruteForcer
+MainForm --> PerformanceLogger
+
+PasswordGenerator --> AppSettings
+PasswordHasher --> AppSettings
+BruteForceGenerator --> AppSettings
+SingleThreadBruteForcer --> AppSettings
+MultiThreadBruteForcer --> AppSettings
+
+PasswordValidator --> PasswordHasher
+
+SingleThreadBruteForcer --> BruteForceGenerator
+SingleThreadBruteForcer --> PasswordValidator
+SingleThreadBruteForcer --> AttackResult
+SingleThreadBruteForcer --> ProgressInfo
+
+MultiThreadBruteForcer --> PasswordValidator
+MultiThreadBruteForcer --> AttackResult
+MultiThreadBruteForcer --> ProgressInfo
+
+PerformanceLogger --> AttackResult
+
+@enduml
