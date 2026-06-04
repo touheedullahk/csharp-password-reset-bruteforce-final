@@ -4,9 +4,11 @@
 
 This project is a C# Windows Forms application that demonstrates a local password reset simulation using brute-force password recovery.
 
-The application will generate a random password, hash it using SHA256 with a static salt, and then attempt to recover the password using both single-threaded and multi-threaded brute-force methods.
+The application generates a random password, hashes it using SHA256 with a constant static salt, and then attempts to recover the password using both single-threaded and multi-threaded brute-force methods.
 
-This project is created for educational purposes only.
+This project is created for educational purposes only. It is designed to demonstrate hashing, brute-force search, multithreading, progress tracking, performance logging, and GitHub-based version control.
+
+---
 
 ## Technologies Used
 
@@ -14,22 +16,36 @@ This project is created for educational purposes only.
 - Windows Forms
 - .NET 8
 - SHA256 hashing
+- Static salt
 - Task-based multithreading
+- CancellationTokenSource
 - GitHub version control
+- Draw.io / UML class diagram
 
-## Planned Features
+---
 
-- Random password creation
-- SHA256 hashing with static salt
+## Main Features
+
+- Random password generation
+- Password length randomly generated between `[4-6)`, meaning 4 or 5 characters
+- SHA256 hashing with a constant static salt
 - Start and stop brute-force attack
 - Single-thread brute-force mode
 - Multi-thread brute-force mode
-- Progress display
-- Elapsed time display
+- Maximum worker threads limited to CPU cores minus one
+- Brute-force search starts from length 1 and continues up to length 6
+- Brute-force algorithm does not know the password length in advance
+- Separate brute-force generator and password validator classes
+- Live progress display
+- Live elapsed time display
+- Attempts checked display
+- Threads used display
 - Found password output
-- Performance logging
+- Performance logging for single-thread and multi-thread attacks
 - UML class diagram
-- Final test report
+- Development notes for final report preparation
+
+---
 
 ## Project Structure
 
@@ -37,16 +53,29 @@ This project is created for educational purposes only.
 PasswordBruteForceApp/
 │
 ├── Models/
-│   └── Model classes will be added here
+│   ├── AttackResult.cs
+│   └── ProgressInfo.cs
 │
 ├── Services/
-│   └── Main functionality classes will be added here
+│   ├── AppSettings.cs
+│   ├── PasswordGenerator.cs
+│   ├── PasswordHasher.cs
+│   ├── PasswordValidator.cs
+│   ├── BruteForceGenerator.cs
+│   ├── SingleThreadBruteForcer.cs
+│   ├── MultiThreadBruteForcer.cs
+│   └── PerformanceLogger.cs
 │
 ├── Logs/
-│   └── Performance log files will be stored here
+│   └── performance-log.txt
 │
 ├── Docs/
-│   └── UML diagram and report materials will be stored here
+│   ├── uml-class-diagram.puml
+│   └── password_bruteforce_uml_clean_fixed.drawio
 │
+├── MainForm.cs
+├── MainForm.Designer.cs
 ├── Program.cs
-└── Main Windows Forms files
+├── README.md
+└── development-notes.md
+```
