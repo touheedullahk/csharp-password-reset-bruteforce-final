@@ -1,0 +1,188 @@
+<mxfile host="app.diagrams.net" agent="ChatGPT">
+  <diagram id="PasswordBruteForceUMLCleanFixed" name="UML Class Diagram">
+    <mxGraphModel dx="1768" dy="929" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1400" pageHeight="900" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="title" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=none;" value="&lt;div style=&quot;font-family: Helvetica; font-size: 22px; font-weight: 700; color: rgb(32, 33, 36);&quot;&gt;Password Reset Brute Force Application&lt;/div&gt;&lt;div style=&quot;font-family: Helvetica; font-size: 12px; color: rgb(95, 99, 104);&quot;&gt;&lt;br&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="50" width="520" x="390" y="20" as="geometry" />
+        </mxCell>
+        <mxCell id="MainForm" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#dadce0;fontColor=#202124;fontSize=12;fontFamily=Helvetica;spacing=8;" value="&lt;div style=&quot;text-align:left;font-family:Helvetica;font-size:12px;color:#202124;&quot;&gt;&lt;div style=&quot;background:#e8f0fe;border-bottom:1px solid #dadce0;padding:6px 8px;font-weight:700;&quot;&gt;MainForm&lt;/div&gt;&lt;div style=&quot;padding:6px 8px;border-bottom:1px solid #dadce0;&quot;&gt;- passwordGenerator : PasswordGenerator&lt;br/&gt;- passwordHasher : PasswordHasher&lt;br/&gt;- singleThreadBruteForcer : SingleThreadBruteForcer&lt;br/&gt;- multiThreadBruteForcer : MultiThreadBruteForcer&lt;br/&gt;- performanceLogger : PerformanceLogger&lt;/div&gt;&lt;div style=&quot;padding:6px 8px;&quot;&gt;+ btnCreatePassword_Click()&lt;br/&gt;+ btnStartSingleThread_Click()&lt;br/&gt;+ btnStartMultiThread_Click()&lt;br/&gt;+ btnStopAttack_Click()&lt;br/&gt;+ UpdateProgressDisplay()&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="200" width="380" x="450" y="70" as="geometry" />
+        </mxCell>
+        <mxCell id="AppSettings" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#dadce0;fontColor=#202124;fontSize=12;fontFamily=Helvetica;spacing=8;" value="&lt;div style=&quot;text-align:left;font-family:Helvetica;font-size:12px;color:#202124;&quot;&gt;&lt;div style=&quot;background:#e8f0fe;border-bottom:1px solid #dadce0;padding:6px 8px;font-weight:700;&quot;&gt;AppSettings&lt;/div&gt;&lt;div style=&quot;padding:6px 8px;border-bottom:1px solid #dadce0;&quot;&gt;+ StaticSalt : string&lt;br/&gt;+ CharacterSet : string&lt;br/&gt;+ MaxWorkerThreads : int&lt;/div&gt;&lt;div style=&quot;padding:6px 8px;&quot;&gt;+ GetTotalCombinationCount() : long&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="130" width="250" x="400" y="490" as="geometry" />
+        </mxCell>
+        <mxCell id="PasswordGenerator" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#dadce0;fontColor=#202124;fontSize=12;fontFamily=Helvetica;spacing=8;" value="&lt;div style=&quot;text-align:left;font-family:Helvetica;font-size:12px;color:#202124;&quot;&gt;&lt;div style=&quot;background:#e8f0fe;border-bottom:1px solid #dadce0;padding:6px 8px;font-weight:700;&quot;&gt;PasswordGenerator&lt;/div&gt;&lt;div style=&quot;padding:6px 8px;&quot;&gt;+ GeneratePassword() : string&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="100" width="220" x="400" y="330" as="geometry" />
+        </mxCell>
+        <mxCell id="PasswordHasher" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#dadce0;fontColor=#202124;fontSize=12;fontFamily=Helvetica;spacing=8;" value="&lt;div style=&quot;text-align:left;font-family:Helvetica;font-size:12px;color:#202124;&quot;&gt;&lt;div style=&quot;background:#e8f0fe;border-bottom:1px solid #dadce0;padding:6px 8px;font-weight:700;&quot;&gt;PasswordHasher&lt;/div&gt;&lt;div style=&quot;padding:6px 8px;&quot;&gt;+ HashPassword(password) : string&lt;br/&gt;+ VerifyPassword(plainPassword, expectedHash) : bool&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="100" width="220" x="730" y="330" as="geometry" />
+        </mxCell>
+        <mxCell id="PasswordValidator" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#dadce0;fontColor=#202124;fontSize=12;fontFamily=Helvetica;spacing=8;" value="&lt;div style=&quot;text-align:left;font-family:Helvetica;font-size:12px;color:#202124;&quot;&gt;&lt;div style=&quot;background:#e8f0fe;border-bottom:1px solid #dadce0;padding:6px 8px;font-weight:700;&quot;&gt;PasswordValidator&lt;/div&gt;&lt;div style=&quot;padding:6px 8px;border-bottom:1px solid #dadce0;&quot;&gt;- passwordHasher : PasswordHasher&lt;/div&gt;&lt;div style=&quot;padding:6px 8px;&quot;&gt;+ IsPasswordMatch(candidatePassword, targetHash) : bool&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="90" width="240" x="720" y="510" as="geometry" />
+        </mxCell>
+        <mxCell id="PerformanceLogger" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#dadce0;fontColor=#202124;fontSize=12;fontFamily=Helvetica;spacing=8;" value="&lt;div style=&quot;text-align:left;font-family:Helvetica;font-size:12px;color:#202124;&quot;&gt;&lt;div style=&quot;background:#e8f0fe;border-bottom:1px solid #dadce0;padding:6px 8px;font-weight:700;&quot;&gt;PerformanceLogger&lt;/div&gt;&lt;div style=&quot;padding:6px 8px;border-bottom:1px solid #dadce0;&quot;&gt;- logFilePath : string&lt;/div&gt;&lt;div style=&quot;padding:6px 8px;&quot;&gt;+ LogAttackResult(...)&lt;br/&gt;+ GetLogFilePath() : string&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="110" width="280" x="1070" y="640" as="geometry" />
+        </mxCell>
+        <mxCell id="BruteForceGenerator" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#dadce0;fontColor=#202124;fontSize=12;fontFamily=Helvetica;spacing=8;" value="&lt;div style=&quot;text-align:left;font-family:Helvetica;font-size:12px;color:#202124;&quot;&gt;&lt;div style=&quot;background:#e8f0fe;border-bottom:1px solid #dadce0;padding:6px 8px;font-weight:700;&quot;&gt;BruteForceGenerator&lt;/div&gt;&lt;div style=&quot;padding:6px 8px;&quot;&gt;+ GenerateAllCombinations()&lt;br/&gt;+ GenerateCombinationsByLength(length)&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="100" width="260" x="70" y="780" as="geometry" />
+        </mxCell>
+        <mxCell id="SingleThreadBruteForcer" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#dadce0;fontColor=#202124;fontSize=12;fontFamily=Helvetica;spacing=8;" value="&lt;div style=&quot;text-align:left;font-family:Helvetica;font-size:12px;color:#202124;&quot;&gt;&lt;div style=&quot;background:#e8f0fe;border-bottom:1px solid #dadce0;padding:6px 8px;font-weight:700;&quot;&gt;SingleThreadBruteForcer&lt;/div&gt;&lt;div style=&quot;padding:6px 8px;border-bottom:1px solid #dadce0;&quot;&gt;- generator : BruteForceGenerator&lt;br/&gt;- validator : PasswordValidator&lt;/div&gt;&lt;div style=&quot;padding:6px 8px;&quot;&gt;+ StartAttack(targetHash, cancellationToken, progress) : AttackResult&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="120" width="300" x="50" y="410" as="geometry" />
+        </mxCell>
+        <mxCell id="MultiThreadBruteForcer" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#dadce0;fontColor=#202124;fontSize=12;fontFamily=Helvetica;spacing=8;" value="&lt;div style=&quot;text-align:left;font-family:Helvetica;font-size:12px;color:#202124;&quot;&gt;&lt;div style=&quot;background:#e8f0fe;border-bottom:1px solid #dadce0;padding:6px 8px;font-weight:700;&quot;&gt;MultiThreadBruteForcer&lt;/div&gt;&lt;div style=&quot;padding:6px 8px;border-bottom:1px solid #dadce0;&quot;&gt;- validator : PasswordValidator&lt;/div&gt;&lt;div style=&quot;padding:6px 8px;&quot;&gt;+ StartAttack(targetHash, cancellationToken, progress) : AttackResult&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="120" width="300" x="1030" y="410" as="geometry" />
+        </mxCell>
+        <mxCell id="AttackResult" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#dadce0;fontColor=#202124;fontSize=12;fontFamily=Helvetica;spacing=8;" value="&lt;div style=&quot;text-align:left;font-family:Helvetica;font-size:12px;color:#202124;&quot;&gt;&lt;div style=&quot;background:#e8f0fe;border-bottom:1px solid #dadce0;padding:6px 8px;font-weight:700;&quot;&gt;AttackResult&lt;/div&gt;&lt;div style=&quot;padding:6px 8px;border-bottom:1px solid #dadce0;&quot;&gt;+ IsSuccess : bool&lt;br/&gt;+ FoundPassword : string&lt;br/&gt;+ AttemptsCount : long&lt;br/&gt;+ ElapsedTime : TimeSpan&lt;br/&gt;+ ThreadsUsed : int&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="140" width="300" x="530" y="660" as="geometry" />
+        </mxCell>
+        <mxCell id="ProgressInfo" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#dadce0;fontColor=#202124;fontSize=12;fontFamily=Helvetica;spacing=8;" value="&lt;div style=&quot;text-align:left;font-family:Helvetica;font-size:12px;color:#202124;&quot;&gt;&lt;div style=&quot;background:#e8f0fe;border-bottom:1px solid #dadce0;padding:6px 8px;font-weight:700;&quot;&gt;ProgressInfo&lt;/div&gt;&lt;div style=&quot;padding:6px 8px;border-bottom:1px solid #dadce0;&quot;&gt;+ AttemptsChecked : long&lt;br/&gt;+ TotalCombinations : long&lt;br/&gt;+ CurrentLength : int&lt;br/&gt;+ ProgressPercentage : int&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="130" width="300" x="530" y="830" as="geometry" />
+        </mxCell>
+        <mxCell id="c1" edge="1" parent="1" source="MainForm" style="endArrow=block;endFill=1;html=1;rounded=0;strokeColor=#5f6368;entryX=0.536;entryY=0.001;entryDx=0;entryDy=0;exitX=0.396;exitY=0.994;exitDx=0;exitDy=0;entryPerimeter=0;exitPerimeter=0;strokeWidth=3;" target="PasswordGenerator" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="600" y="300" />
+              <mxPoint x="518" y="300" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="c2" edge="1" parent="1" source="MainForm" style="endArrow=block;endFill=1;html=1;rounded=0;strokeColor=#5f6368;exitX=0.75;exitY=1;exitDx=0;exitDy=0;strokeWidth=3;" target="PasswordHasher" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="735" y="300" />
+              <mxPoint x="840" y="300" />
+            </Array>
+            <mxPoint x="760" y="280" as="sourcePoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="c3" edge="1" parent="1" source="MainForm" style="endArrow=block;endFill=1;html=1;rounded=0;strokeColor=#5f6368;exitX=-0.002;exitY=0.45;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0.638;entryY=-0.01;entryDx=0;entryDy=0;entryPerimeter=0;strokeWidth=3;" target="SingleThreadBruteForcer" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="241" y="160" />
+            </Array>
+            <mxPoint x="240" y="400" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="c4" edge="1" parent="1" source="MainForm" style="endArrow=block;endFill=1;html=1;rounded=0;strokeColor=#5f6368;exitX=1;exitY=0.5;exitDx=0;exitDy=0;strokeWidth=3;" target="MultiThreadBruteForcer" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1180" y="170" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="c5" edge="1" parent="1" source="MainForm" style="endArrow=block;endFill=1;html=1;rounded=0;strokeColor=#5f6368;entryX=1;entryY=0.5;entryDx=0;entryDy=0;exitX=1;exitY=0.25;exitDx=0;exitDy=0;strokeWidth=3;" target="PerformanceLogger" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1110" y="120" />
+              <mxPoint x="1380" y="120" />
+              <mxPoint x="1380" y="440" />
+              <mxPoint x="1380" y="695" />
+            </Array>
+            <mxPoint x="830" y="160" as="sourcePoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="c6" edge="1" parent="1" source="PasswordValidator" style="endArrow=block;endFill=1;html=1;rounded=0;strokeColor=#5f6368;strokeWidth=3;" target="PasswordHasher" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="c7" edge="1" parent="1" source="SingleThreadBruteForcer" style="endArrow=block;endFill=1;html=1;rounded=0;strokeColor=#5f6368;strokeWidth=3;" target="BruteForceGenerator" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="c8" edge="1" parent="1" source="SingleThreadBruteForcer" style="endArrow=block;endFill=1;html=1;rounded=0;strokeColor=#5f6368;exitX=0.814;exitY=0.997;exitDx=0;exitDy=0;exitPerimeter=0;strokeWidth=3;" target="PasswordValidator" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="294" y="650" />
+              <mxPoint x="560" y="650" />
+              <mxPoint x="840" y="650" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="c9" edge="1" parent="1" source="SingleThreadBruteForcer" style="endArrow=block;endFill=1;html=1;rounded=0;strokeColor=#5f6368;exitX=0.733;exitY=1.004;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0.003;entryY=0.398;entryDx=0;entryDy=0;entryPerimeter=0;strokeWidth=3;" target="AttackResult" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="270" y="716" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="c10" edge="1" parent="1" source="SingleThreadBruteForcer" style="endArrow=block;endFill=1;html=1;rounded=0;strokeColor=#5f6368;exitX=0.672;exitY=1.012;exitDx=0;exitDy=0;exitPerimeter=0;strokeWidth=3;" target="ProgressInfo" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="250" y="740" />
+              <mxPoint x="460" y="740" />
+              <mxPoint x="460" y="890" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="c11" edge="1" parent="1" source="MultiThreadBruteForcer" style="endArrow=block;endFill=1;html=1;rounded=0;strokeColor=#5f6368;" target="PasswordValidator" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="c12" edge="1" parent="1" source="MultiThreadBruteForcer" style="endArrow=block;endFill=1;html=1;rounded=0;strokeColor=#5f6368;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=1;entryY=0.25;entryDx=0;entryDy=0;strokeWidth=3;" target="AttackResult" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1180" y="620" />
+              <mxPoint x="1020" y="620" />
+              <mxPoint x="1020" y="695" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="c13" edge="1" parent="1" source="MultiThreadBruteForcer" style="endArrow=block;endFill=1;html=1;rounded=0;strokeColor=#5f6368;exitX=0.25;exitY=1;exitDx=0;exitDy=0;strokeWidth=3;" target="ProgressInfo" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1105" y="590" />
+              <mxPoint x="990" y="590" />
+              <mxPoint x="990" y="650" />
+              <mxPoint x="930" y="650" />
+              <mxPoint x="930" y="895" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="c14" edge="1" parent="1" source="PerformanceLogger" style="endArrow=block;endFill=1;html=1;rounded=0;strokeColor=#5f6368;exitX=-0.003;exitY=0.807;exitDx=0;exitDy=0;exitPerimeter=0;strokeWidth=3;" target="AttackResult" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="c15" edge="1" parent="1" source="PasswordGenerator" style="endArrow=block;endFill=1;html=1;rounded=0;strokeColor=#5f6368;dashed=1;exitX=0.527;exitY=1.023;exitDx=0;exitDy=0;exitPerimeter=0;strokeWidth=4;" target="AppSettings" value="uses">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="c16" edge="1" parent="1" source="PasswordHasher" style="endArrow=block;endFill=1;html=1;rounded=0;strokeColor=#5f6368;dashed=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=0.638;entryY=-0.023;entryDx=0;entryDy=0;entryPerimeter=0;strokeWidth=4;" target="AppSettings" value="uses">
+          <mxGeometry relative="1" x="0.0034" as="geometry">
+            <mxPoint as="offset" />
+            <Array as="points">
+              <mxPoint x="650" y="380" />
+              <mxPoint x="650" y="460" />
+              <mxPoint x="560" y="460" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="c17" edge="1" parent="1" source="BruteForceGenerator" style="endArrow=block;endFill=1;html=1;rounded=0;strokeColor=#5f6368;dashed=1;entryX=0.322;entryY=1.001;entryDx=0;entryDy=0;entryPerimeter=0;strokeWidth=4;" target="AppSettings" value="uses">
+          <mxGeometry relative="1" x="-0.2775" as="geometry">
+            <mxPoint as="offset" />
+            <Array as="points">
+              <mxPoint x="400" y="830" />
+              <mxPoint x="400" y="680" />
+              <mxPoint x="480" y="680" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="c18" edge="1" parent="1" source="SingleThreadBruteForcer" style="endArrow=block;endFill=1;html=1;rounded=0;strokeColor=#5f6368;dashed=1;exitX=1.014;exitY=0.403;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0.176;entryY=-0.009;entryDx=0;entryDy=0;entryPerimeter=0;strokeWidth=4;" target="AppSettings" value="uses">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="440" y="460" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="c19" edge="1" parent="1" source="MultiThreadBruteForcer" style="endArrow=block;endFill=1;html=1;rounded=0;strokeColor=#5f6368;dashed=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;strokeWidth=4;" value="uses">
+          <mxGeometry relative="1" x="0.342" y="2" as="geometry">
+            <mxPoint as="offset" />
+            <Array as="points">
+              <mxPoint x="970" y="470" />
+              <mxPoint x="690" y="470" />
+              <mxPoint x="690" y="523" />
+            </Array>
+            <mxPoint x="1030" y="461" as="sourcePoint" />
+            <mxPoint x="650.0000000000002" y="522.5492957746478" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
